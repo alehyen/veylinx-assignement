@@ -71,6 +71,7 @@ class PostView(PaginatorMixin, APIView):
             status=HTTP_201_CREATED
         )
 
+    # here we can enforce that only not deleted posts can be modified
     def put(self, request):
         update_serializer = PostEditSerializer(data=request.data)
         if not update_serializer.is_valid():
