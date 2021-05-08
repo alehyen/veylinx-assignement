@@ -1,0 +1,25 @@
+POSTGRES_CONTAINER ?= postgres-veylinx
+POSTGRES_IMAGE ?= postgres:13
+DIVE_MEDICAL_DB ?= veylinx
+POSTGRES_PASSWORD ?= azerty789
+POSTGRES_BIND_PORT ?= 5444
+BIND_PORT ?= -p ${POSTGRES_BIND_PORT}:5432
+RABBITMQ_CONTAINER ?= rabbitmq-veylinx
+RABBITMQ_BIND_PORT ?= 5672
+RABBITMQ_BIND ?= -p ${RABBITMQ_BIND_PORT}:5672
+RABBITMQ_IMAGE ?= rabbitmq
+
+run_postgres_local:
+	docker run -d \
+	--name ${POSTGRES_CONTAINER} \
+	-e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+	-e POSTGRES_DB=${DIVE_MEDICAL_DB} \
+	${BIND_PORT} \
+	${POSTGRES_IMAGE}
+
+run_rabbitmq_local:
+	docker run -d \
+	--name ${RABBITMQ_CONTAINER} \
+	${RABBITMQ_BIND} \
+	${RABBITMQ_IMAGE}
+

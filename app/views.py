@@ -12,6 +12,7 @@ from app.serializers import UserSignUpSerializer, PostCreateSerializer, \
     PostEditSerializer, PostDeleteSerializer, PostSerializer, PopularHashtagSerializer
 from app.models import Post, Hashtag
 from app.utils import get_hashtags
+from app.tasks import send_welcome_email
 
 
 @api_view(["Post"])
@@ -20,10 +21,14 @@ def create_user(request):
     signup_serializer = UserSignUpSerializer(data=request.data)
     if not signup_serializer.is_valid():
         return Response(signup_serializer.errors, status=HTTP_400_BAD_REQUEST)
+    email = signup_serializer.data.get("email", None)
     user = User.objects.create_user(
         username=signup_serializer.data["username"],
-        password=signup_serializer.data["password"]
+        password=signup_serializer.data["password"],
+        email=email
     )
+    if email:
+        send_welcome_email.delay(email)
     return Response(
         {
             "username": user.username
