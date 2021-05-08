@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from app.models import Post
+from app.models import Post, Hashtag
 
 
 class UserSignUpSerializer(serializers.Serializer):
@@ -21,7 +21,20 @@ class PostDeleteSerializer(serializers.Serializer):
     id_post = serializers.IntegerField(required=True)
 
 
+class HashtagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hashtag
+        fields = ['name']
+
+
 class PostSerializer(serializers.ModelSerializer):
+    tags = HashtagSerializer(many=True, read_only=True)
+
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['text', 'created_at', 'tags']
+
+
+class PopularHashtagSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True)
+    count = serializers.IntegerField(required=True)

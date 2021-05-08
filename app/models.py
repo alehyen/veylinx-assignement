@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
+class Hashtag(models.Model):
+    id_hashtag = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, unique=True)
+
+
 class Post(models.Model):
     """
         Note: I'm using the built in User model to reference the user in the post,
@@ -15,3 +20,4 @@ class Post(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     # for the soft delete
     deleted = models.BooleanField(default=False)
+    tags = models.ManyToManyField(Hashtag)
