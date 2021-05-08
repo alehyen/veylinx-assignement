@@ -3,3 +3,5 @@ djangorestframework==3.12.4
 psycopg2==2.8.6
 djangorestframework-simplejwt==4.6.0
 pytest-django==4.2.0
+celery==5.0.5
+django-celery-beat==2.2.0

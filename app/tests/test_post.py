@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 import pytest
 
 from app.models import Post, Hashtag
+from app.utils import get_old_posts
 
 
 @pytest.mark.django_db
@@ -71,3 +72,10 @@ def test_bad_parameters(authenticated_client):
     res = authenticated_client.post('/api/posts/', data=payload)
     assert res.status_code == 400
     assert 'text' in json.loads(res.content)
+
+
+def test_get_old_posts(old_posts):
+    p1, p2 = old_posts
+    old = get_old_posts(older_than=10)
+    assert p1.id_post in old
+    assert p2.id_post not in old

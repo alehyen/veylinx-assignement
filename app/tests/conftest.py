@@ -43,3 +43,18 @@ def test_posts(db, authenticated_client):
         'hashtag #test'
     ]:
         authenticated_client.post('/api/posts/', data={'text': text})
+
+@pytest.fixture
+def old_posts(db, test_user):
+    from datetime import timedelta
+    from django.utils import timezone
+    p1 = Post.objects.create(
+        owner=test_user,
+        text="this is an old post",
+        created_at=timezone.now()-timedelta(days=11)
+    )
+    p2 = Post.objects.create(
+        owner=test_user,
+        text="this is a recent post",
+    )
+    return p1, p2

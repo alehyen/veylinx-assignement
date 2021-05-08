@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-tkm0#5+tvijm#vrm#kho1gkfhoa9bfez7nr)il6k&m*vb*pqgo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get("DEBUG", 1))
 
 ALLOWED_HOSTS = []
 
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'rest_framework',
+    'django_celery_beat.apps.BeatConfig',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +137,14 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "amqp://guest:guest@127.0.0.1:5672//")
+
+CELERY_BEAT_SCHEDULE = {
+    "scheduled_task": {
+        "task": "app.tasks.delete_old_posts",
+        # every day at midnight
+        "schedule": crontab(minute=0, hour=0),
+        "args": (10,),
+    },
+}

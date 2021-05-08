@@ -6,6 +6,7 @@ from app.models import Post, Hashtag
 class UserSignUpSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
+    email = serializers.CharField(required=False)
 
 
 class PostCreateSerializer(serializers.Serializer):
