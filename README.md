@@ -16,6 +16,13 @@ creating a custom user model with a OneToOneField to the built-in User model, an
 relathionship to the hashtag table to store favorite hashtags, and then to add/delete favorites hashtags 
 is a simple crud and to get posts from favorite hashtags we can re-use the `api/hashtags/<hashtag>/posts/` endpoint
 
+## Celery
+for the questions that requires sending an email I created just the signature of the functions,
+because sending an email will require configuring and email server which I believe is not relevant 
+for the purpose of the assignment.
+
+for the periodic task I just configured it in the CELERY_BEAT_SCHEDULE setting, however we can create 
+the schedule in the database and configure celery beat to fetch the periodic tasks from the database
 ## Thoughts about scaling
 
 - the soft delete can cause some performance issues when considering important data in the post model, because there is always a filtering by the `deleted` field,
