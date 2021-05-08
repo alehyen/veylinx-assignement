@@ -1,0 +1,66 @@
+version: '3.7'
+services:
+  backend:
+    build: .
+    command: gunicorn --chdir /home/app/web/core wsgi  --bind 0.0.0.0:8000
+    volumes:
+    - static_volume:/home/app/staticfiles/static
+    expose:
+      - 8000
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13.0-alpine
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=azerty789
+      - POSTGRES_DB=veylinx
+
+  nginx:
+    build: ./nginx
+    volumes:
+    - static_volume:/home/app/staticfiles/static
+    ports:
+    - 80:80
+    depends_on:
+      - backend
+  celery:
+    build: .
+    command: celery -A core.celery_conf:app worker -l info
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - backend
+      - rabbitmq
+
+  celery-beat:
+    build: .
+    command: celery -A core.celery_conf:app beat -l info
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - backend
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3.8.16-alpine
+
+  dahsboard:
+    build: .
+    command: flower -A core.celery_conf:app --port=5555 --broker=amqp://guest:guest@rabbitmq:5672//
+    ports:
+      - 5555:5555
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - backend
+      - celery
+      - rabbitmq
+volumes:
+  postgres_data:
+  static_volume:
