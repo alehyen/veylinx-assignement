@@ -44,5 +44,7 @@ duplicated hashtags and just reference them in the post, this might cause perfor
   hashtag, and that require a double join of the hashtag and post table, same for the most popular hashtags query,
   a need for and index search of the field `name` of the hashtag table might be a good solution
 
+- I've run the app in wsgi mode through gunicorn with nginx as a reverse proxy, but for more performance and since
+ the front in mostly async it's better to run it in asgi mode with daphne or uvicorn
 # Tests
 to run the tests simply type `pytest` in the root of the project
