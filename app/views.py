@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, InvalidPage
+from django.db.models import Count
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -8,8 +9,9 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST,\
 from rest_framework.views import APIView
 
 from app.serializers import UserSignUpSerializer, PostCreateSerializer, \
-    PostEditSerializer, PostDeleteSerializer, PostSerializer
-from app.models import Post
+    PostEditSerializer, PostDeleteSerializer, PostSerializer, PopularHashtagSerializer
+from app.models import Post, Hashtag
+from app.utils import get_hashtags
 
 
 @api_view(["Post"])
@@ -64,6 +66,14 @@ class PostView(PaginatorMixin, APIView):
             owner=request.user,
             text=post_serializer.data["text"]
         )
+        hashtags = get_hashtags(post_serializer.data["text"])
+        if hashtags:
+            _bulk = []
+            for hashtag in hashtags:
+                tag, created = Hashtag.objects.get_or_create(name=hashtag.lower())
+                _bulk.append(tag)
+            post.tags.add(*_bulk)
+            # I'm using bulk add for more efficiency
         return Response(
             {
                 "id_post": post.id_post
@@ -119,3 +129,23 @@ class UsersPostView(PaginatorMixin, APIView):
                 },
                 status=HTTP_404_NOT_FOUND
             )
+
+
+class HashtagPostsView(PaginatorMixin, APIView):
+    # Think about creating an index on name field of hashtag
+    def get(self, request, hashtag):
+        return self.get_paginated_response(
+            Post.objects.filter(
+                tags__name=hashtag.lower(),
+                deleted=False
+            ).order_by('-created_at'),
+            PostSerializer
+        )
+
+
+@api_view(["GET"])
+def popular_hashtags(request):
+    # [:5] will actually add a LIMIT 5 to the query not fetch all the rows
+    # and then take just the 5 first
+    query = Hashtag.objects.filter(post__deleted=False).annotate(count=Count('post')).order_by('-count')[:5]
+    return Response(PopularHashtagSerializer(query, many=True).data)
