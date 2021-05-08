@@ -1,5 +1,14 @@
+## App
+ to run the app `docker-compose up -d --build`
+
+the app will be available in `localhost:80`
+
+to create a superuser to access the admin panel `docker-compose exec backend python manage.py createsuperuser`
+
+a flower dashboard to monitor the celery tasks is available in `localhost:5555`
+
 ## Endpoints
-- POST api/create_user/: allow to create a user with username and password provided in the body
+- POST api/create_user/: allow to create a user with username and password and email optional provided in the body
 - POST api/token/:  authenticate a user, username and password should be provided in the body
 - POST api/token/refresh/: get a new access token based on a refresh token provided in the body
 - POST api/posts/: create a new post with the associated hashtags. Should have text in the body
@@ -13,7 +22,7 @@
 ## Hashtag system
 I didn't implement the question 5 and 6 of the hashtag system, just because it will require 
 creating a custom user model with a OneToOneField to the built-in User model, and a ManytoMany
-relathionship to the hashtag table to store favorite hashtags, and then to add/delete favorites hashtags 
+relationship to the hashtag table to store favorite hashtags, and then to add/delete favorites hashtags 
 is a simple crud and to get posts from favorite hashtags we can re-use the `api/hashtags/<hashtag>/posts/` endpoint
 
 ## Celery
@@ -29,7 +38,7 @@ the schedule in the database and configure celery beat to fetch the periodic tas
 one solution will be creating search indexes on the `deleted` field, or creating a separate table
 to store the deleted posts and physically delete them from the post table to avoid the extra filtering
   
-- I've choosen to make a ManytoMany relationship between posts and hashtags to avoid storing 
+- I've chosen to make a ManytoMany relationship between posts and hashtags to avoid storing 
 duplicated hashtags and just reference them in the post, this might cause performance problems
   when considering a very important number of hashtags because there is a filtering with posts that contain a specific 
   hashtag, and that require a double join of the hashtag and post table, same for the most popular hashtags query,
@@ -37,5 +46,3 @@ duplicated hashtags and just reference them in the post, this might cause perfor
 
 # Tests
 to run the tests simply type `pytest` in the root of the project
-
-#### Note: I'll be updating this readme gradually when adding new features
