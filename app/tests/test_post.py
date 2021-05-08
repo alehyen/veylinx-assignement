@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 import pytest
 
-from app.models import Post
+from app.models import Post, Hashtag
 
 
 @pytest.mark.django_db
@@ -30,12 +30,13 @@ def test_unauthorized_access(anonymous_client, url):
 
 def test_create_post(authenticated_client):
     payload = {
-        "text": "Best Post ever"
+        "text": "Best Post ever #best"
     }
     assert Post.objects.count() == 0
     res = authenticated_client.post('/api/posts/', data=payload)
     assert res.status_code == 201
     assert Post.objects.count() == 1
+    assert Hashtag.objects.count() == 1
 
 
 def test_update_post(authenticated_client, test_post):

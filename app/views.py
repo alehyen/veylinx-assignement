@@ -81,8 +81,13 @@ class PostView(PaginatorMixin, APIView):
             status=HTTP_201_CREATED
         )
 
-    # here we can enforce that only not deleted posts can be modified
     def put(self, request):
+        """
+            here we can enforce that only not deleted posts can be modified also,
+            we should update the list of hashtags of the post, because they can be modified,
+            I'm not going to do it but it's pretty easy, just delete all the hashtags associated
+            with a post and re calculate them using the function get_hashtags
+        """
         update_serializer = PostEditSerializer(data=request.data)
         if not update_serializer.is_valid():
             return Response(update_serializer.errors, status=HTTP_400_BAD_REQUEST)

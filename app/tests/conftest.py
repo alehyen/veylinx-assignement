@@ -33,3 +33,13 @@ def authenticated_client(test_user):
     refresh = RefreshToken.for_user(test_user)
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
     return client
+
+
+@pytest.fixture
+def test_posts(db, authenticated_client):
+    for text in [
+        'lorem ipsum #hashtag #another_one',
+        'lorem #hashtag ipsum',
+        'hashtag #test'
+    ]:
+        authenticated_client.post('/api/posts/', data={'text': text})
