@@ -6,7 +6,7 @@ from app.utils import get_old_posts
 def send_welcome_email(email):
     """
         sending a welcome email will require configuring an email server
-        which I believe is not relevant for the purpose of this assignement
+        which I believe is not relevant for the purpose of this assignment
         so I'm creating just the signature of the function
     """
     pass
