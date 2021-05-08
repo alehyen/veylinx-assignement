@@ -2,3 +2,4 @@ Django==3.2.2
 djangorestframework==3.12.4
 psycopg2==2.8.6
 djangorestframework-simplejwt==4.6.0
+pytest-django==4.2.0
