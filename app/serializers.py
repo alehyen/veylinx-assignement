@@ -18,7 +18,7 @@ class PostEditSerializer(serializers.Serializer):
 
 
 class PostDeleteSerializer(serializers.Serializer):
-    text = serializers.CharField(required=True)
+    id_post = serializers.IntegerField(required=True)
 
 
 class PostSerializer(serializers.ModelSerializer):
