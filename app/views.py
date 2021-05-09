@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, InvalidPage
+from django.db import IntegrityError
 from django.db.models import Count
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -22,18 +23,29 @@ def create_user(request):
     if not signup_serializer.is_valid():
         return Response(signup_serializer.errors, status=HTTP_400_BAD_REQUEST)
     email = signup_serializer.data.get("email", None)
-    user = User.objects.create_user(
-        username=signup_serializer.data["username"],
-        password=signup_serializer.data["password"],
-        email=email
-    )
-    if email:
-        send_welcome_email.delay(email)
-    return Response(
-        {
-            "username": user.username
-        },
-        status=HTTP_201_CREATED)
+    try:
+        user = User.objects.create_user(
+            username=signup_serializer.data["username"],
+            password=signup_serializer.data["password"],
+            email=email
+        )
+        if email:
+            send_welcome_email.delay(email)
+        return Response(
+            {
+                "username": user.username
+            },
+            status=HTTP_201_CREATED)
+    except IntegrityError as e:
+        if 'duplicate key' in e.args[0]:
+            error = f"username {signup_serializer.data['username']} already exists"
+        else:
+            error = "an error occurred"
+        return Response(
+            {
+                "error": error
+            },
+            status=HTTP_400_BAD_REQUEST)
 
 
 class PaginatorMixin:
