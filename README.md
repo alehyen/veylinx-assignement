@@ -46,5 +46,16 @@ duplicated hashtags and just reference them in the post, this might cause perfor
 
 - I've run the app in wsgi mode through gunicorn with nginx as a reverse proxy, but for more performance and since
  the front in mostly async it's better to run it in asgi mode with daphne or uvicorn
-# Tests
+## Tests
 to run the tests simply type `pytest` in the root of the project
+
+## Edge cases
+
+for finding hashtags in posts I used a simple regex `'#([A-Za-z0-9_]+)'`, but we can elaborate on that regex, for example if we want
+to exclude hashtags that contains only numbers or that are of length superior to 1. Also I'm storing the hashtags 
+without the `#` int the database, just to avoid any problems when searching in the database because 
+`#` is a special character, and it's minus a character when searching for posts with a specific hashtag 
+
+Also what if a post contains multiple times the same hashtag? should we refer to the hashtag in the post just one time or multiple times?
+and in the popular hashtags should it count only once or multile times? it's all questions that deserve to be treated,
+but for simplicity I just count it once in the popular hashtags and refer to it once in the post
